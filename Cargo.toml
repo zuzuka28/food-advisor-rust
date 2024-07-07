@@ -1,0 +1,16 @@
+[package]
+name = "food-adviser-api"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum = "0.7.5"
+diesel = { version = "2.2.1", features = ["postgres"] }
+deadpool-diesel = { version = "0.4.1", features = ["postgres"] }
+diesel_migrations = { version = "2", features = ["postgres"] }
+serde = { version = "1.0.203", features = ["derive"] }
+tokio = { version = "1.38.0", features = ["rt-multi-thread"] }
+uuid = { version = "1.9.1", features = ["v4"] }
+dotenvy = "0.15.7"
