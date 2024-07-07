@@ -140,7 +140,7 @@ impl From<model::CreateRecipeCommand> for CreateRecipe {
             time_to_cook: value.time_to_cook,
             difficulty: value.difficulty,
             servings: value.servings,
-            category_id: String::default(),
+            category_id: value.category,
             ingredients: value
                 .ingredients
                 .iter()
