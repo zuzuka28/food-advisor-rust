@@ -39,6 +39,8 @@ async fn main() {
 
     let myapi = new_api(app_state);
 
+    println!("serve {:}", api_host.clone());
+
     let listener = TcpListener::bind(api_host).await.unwrap();
 
     axum::serve(listener, myapi).await.unwrap();
