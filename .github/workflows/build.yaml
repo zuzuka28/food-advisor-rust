@@ -14,6 +14,7 @@ jobs:
         with:
           RUSTTARGET: x86_64-unknown-linux-musl
           UPLOAD_MODE: none
+          TOOLCHAIN_VERSION: stable
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
