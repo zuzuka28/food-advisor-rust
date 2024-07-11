@@ -16,22 +16,21 @@ async fn main() {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let api_host = env::var("APIHOST").expect("APIHOST must be set");
 
     let db_conn = Arc::new(repository::connect(database_url).await);
 
     let category_storage = Arc::new(repository::CategoryRepository::new(db_conn.clone()).await);
     let recipe_storage = Arc::new(repository::RecipeRepository::new(db_conn.clone()).await);
 
-    let category_service = Arc::new(service::CategoryService::new(
-        service::category::Config { category_storage },
-    ));
+    let category_service = Arc::new(service::CategoryService::new(service::category::Config {
+        category_storage,
+    }));
 
-    let recipe_service = Arc::new(service::RecipeService::new(
-        service::recipe::Config {
-            category_service: category_service.clone(),
-            recipe_storage,
-        },
-    ));
+    let recipe_service = Arc::new(service::RecipeService::new(service::recipe::Config {
+        category_service: category_service.clone(),
+        recipe_storage,
+    }));
 
     let app_state = AppState {
         recipe_service,
@@ -40,7 +39,7 @@ async fn main() {
 
     let myapi = new_api(app_state);
 
-    let listener = TcpListener::bind("0.0.0.0:8000").await.unwrap();
+    let listener = TcpListener::bind(api_host).await.unwrap();
 
     axum::serve(listener, myapi).await.unwrap();
 }
