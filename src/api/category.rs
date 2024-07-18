@@ -5,7 +5,7 @@ use axum::{
 };
 
 use crate::{
-    model::{CategoryQuery, CategorySearchQuery, DeleteCategoryCommand},
+    model::{CategoryQuery, CategorySearchQuery, DeleteCategoryCommand, UpdateCategoryCommand},
     state::AppState,
 };
 
@@ -67,13 +67,14 @@ async fn fetch_category_handler(
 async fn update_category_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(mut item): Json<api_model::UpdateCategory>,
+    Json(item): Json<api_model::UpdateCategory>,
 ) -> Result<Json<api_model::Category>, AppError> {
-    item.id = id;
+    let mut cmd: UpdateCategoryCommand = item.into();
+    cmd.id = id;
 
     let res = state
         .category_service
-        .update(item.into())
+        .update(cmd)
         .await
         .map_err(|e| AppError(e))?;
 

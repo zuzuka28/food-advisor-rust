@@ -40,14 +40,13 @@ impl Into<model::CreateCategoryCommand> for CreateCategory {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateCategory {
-    pub id: String,
     pub name: String,
 }
 
 impl Into<model::UpdateCategoryCommand> for UpdateCategory {
     fn into(self) -> model::UpdateCategoryCommand {
         model::UpdateCategoryCommand {
-            id: self.id,
+            id: String::default(),
             name: self.name,
         }
     }
@@ -157,7 +156,6 @@ impl Into<model::CreateRecipeCommand> for CreateRecipe {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateRecipe {
-    pub id: String,
     pub cover: Option<String>,
     pub title: Option<String>,
     pub description: Option<String>,
@@ -173,7 +171,7 @@ pub struct UpdateRecipe {
 impl Into<model::UpdateRecipeCommand> for UpdateRecipe {
     fn into(self) -> model::UpdateRecipeCommand {
         model::UpdateRecipeCommand {
-            id: self.id,
+            id: String::default(),
             cover: match self.cover {
                 Some(item) => Some(item.into_bytes()),
                 None => None,

@@ -6,11 +6,11 @@ use axum::{
 
 use crate::{
     api::model::AppError,
-    model::{DeleteRecipeCommand, RecipeQuery},
+    model::{DeleteRecipeCommand, RecipeQuery, UpdateRecipeCommand},
     state::AppState,
 };
 
-use super::model as api_model;
+use super::model::{self as api_model};
 
 pub fn build(state: AppState) -> Router {
     Router::new()
@@ -66,13 +66,14 @@ async fn fetch_recipe_handler(
 async fn update_recipe_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
-    Json(mut item): Json<api_model::UpdateRecipe>,
+    Json(item): Json<api_model::UpdateRecipe>,
 ) -> Result<Json<api_model::Recipe>, AppError> {
-    item.id = id;
+    let mut cmd: UpdateRecipeCommand = item.into();
+    cmd.id = id;
 
     let res = state
         .recipe_service
-        .update(item.into())
+        .update(cmd)
         .await
         .map_err(|e| AppError(e))?;
 
