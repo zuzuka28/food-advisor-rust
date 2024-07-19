@@ -31,7 +31,7 @@ async fn search_category_handler(
 ) -> Result<Json<api_model::SearchResult<api_model::Category>>, AppError> {
     let res = state
         .category_service
-        .search(CategorySearchQuery {})
+        .search(CategorySearchQuery { ids: None })
         .await
         .map_err(|e| AppError(e))?;
 

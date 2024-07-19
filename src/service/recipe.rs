@@ -1,7 +1,7 @@
-use std::{error::Error, sync::Arc};
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use crate::{
-    model::{category::CategoryQuery, recipe::*, SearchResult},
+    model::{category::CategoryQuery, recipe::*, CategorySearchQuery, SearchResult},
     repository::RecipeRepository,
 };
 
@@ -26,7 +26,16 @@ impl RecipeService {
     }
 
     pub async fn fetch(&self, q: RecipeQuery) -> Result<Recipe, Box<dyn Error>> {
-        self.recipe_storage.fetch(q).await
+        let mut item = self.recipe_storage.fetch(q).await?;
+
+        item.category = self
+            .category_service
+            .fetch(CategoryQuery {
+                id: item.category.id,
+            })
+            .await?;
+
+        Ok(item)
     }
 
     pub async fn create(&self, item: CreateRecipeCommand) -> Result<Recipe, Box<dyn Error>> {
@@ -35,7 +44,8 @@ impl RecipeService {
             .fetch(CategoryQuery {
                 id: item.category.clone(),
             })
-            .await?;
+            .await
+            .map_err(|_| format!("category with id {} not found", item.category.clone()))?;
 
         let mut res = self.recipe_storage.create(item).await?;
 
@@ -56,6 +66,27 @@ impl RecipeService {
         &self,
         q: RecipeSearchQuery,
     ) -> Result<SearchResult<Recipe>, Box<dyn Error>> {
-        self.recipe_storage.search(q).await
+        let mut res = self.recipe_storage.search(q).await?;
+
+        let category_ids = res
+            .items
+            .iter()
+            .map(|item| Some(item.category.id.clone()))
+            .collect();
+        let categories = self
+            .category_service
+            .search(CategorySearchQuery { ids: category_ids })
+            .await?;
+        let category_to_name = categories
+            .items
+            .into_iter()
+            .map(|item| (item.id, item.name))
+            .collect::<HashMap<String, String>>();
+
+        for item in res.items.iter_mut() {
+            item.category.name = category_to_name.get(&item.category.id).unwrap().clone();
+        }
+
+        Ok(res)
     }
 }

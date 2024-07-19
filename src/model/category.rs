@@ -21,7 +21,9 @@ pub struct DeleteCategoryCommand {
 }
 
 #[derive(Default, Debug, Clone, PartialEq)]
-pub struct CategorySearchQuery {}
+pub struct CategorySearchQuery {
+    pub ids: Option<Vec<String>>,
+}
 
 #[derive(Default, Debug, Clone, PartialEq)]
 pub struct CategoryQuery {

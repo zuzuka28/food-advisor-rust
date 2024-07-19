@@ -105,14 +105,19 @@ impl CategoryRepository {
 
     pub async fn search(
         &self,
-        _: app_model::CategorySearchQuery,
+        q: app_model::CategorySearchQuery,
     ) -> Result<SearchResult<app_model::Category>, Box<dyn Error>> {
         let conn = self.pool.get().await?;
 
         let category_resp = conn
             .interact(|conn| {
-                scheme::categories::table
-                    .select(db_model::Category::as_select())
+                let mut myq = scheme::categories::table.into_boxed();
+
+                if let Some(category_ids) = q.ids {
+                    myq = myq.filter(scheme::categories::uuid.eq_any(category_ids));
+                }
+
+                myq.select(db_model::Category::as_select())
                     .get_results(conn)
             })
             .await??;
