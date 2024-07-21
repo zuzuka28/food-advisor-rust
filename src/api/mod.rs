@@ -2,7 +2,6 @@ mod category;
 mod model;
 mod recipe;
 
-use axum::http::Method;
 use axum::{routing::get, Router};
 use tower_http::cors::{self, CorsLayer};
 
@@ -10,8 +9,9 @@ use crate::state::AppState;
 
 pub fn new_api(state: AppState) -> Router {
     let cors = CorsLayer::new()
-        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
-        .allow_origin(cors::Any);
+        .allow_methods(cors::Any)
+        .allow_origin(cors::Any)
+        .allow_headers(cors::Any);
 
     Router::new()
         .route("/ping", get(ping))
